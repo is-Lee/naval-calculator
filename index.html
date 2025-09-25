@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naval Shock Testing Analysis Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-panel, .results-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .input-panel h2, .results-panel h2 {
+            color: #2a5298;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 1rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .unit {
+            color: #666;
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(42, 82, 152, 0.3);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #2a5298;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2a5298;
+        }
+
+        .result-unit {
+            font-size: 1rem;
+            color: #888;
+            margin-left: 5px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            color: #c33;
+            display: none;
+        }
+
+        .info-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .info-panel h3 {
+            color: #2a5298;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .info-panel p {
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .constants-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .constants-table th,
+        .constants-table td {
+            text-align: left;
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .constants-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .input-panel, .results-panel {
+                padding: 20px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .loading .calculate-btn {
+            background: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Naval Shock Testing Analysis Calculator</h1>
+            <p>Professional acoustic analysis tool for MIL-S-901D compliance testing</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-panel">
+                <h2>Input Parameters</h2>
+                
+                <div class="input-group">
+                    <label for="weight">Equipment Weight <span class="unit">(kg)</span></label>
+                    <input type="number" id="weight" placeholder="Enter weight in kg" min="0" step="0.1">
+                </div>
+
+                <div class="input-group">
+                    <label for="aDimension">A Dimension <span class="unit">(mm)</span></label>
+                    <input type="number" id="aDimension" placeholder="Enter A dimension in mm" min="0" step="0.1">
+                </div>
+
+                <button class="calculate-btn" onclick="calculateShockParameters()">
+                    Calculate Analysis Parameters
+                </button>
+
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+
+            <div class="results-panel">
+                <h2>Analysis Results</h2>
+                
+                <div class="results-grid" id="resultsGrid">
+                    <div class="result-item">
+                        <div class="result-label">Number of Channels</div>
+                        <div class="result-value" id="numChannels">-</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Resonance Frequency</div>
+                        <div class="result-value" id="resonanceFreq">-<span class="result-unit">Hz</span></div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Max Hammer Height</div>
+                        <div class="result-value" id="hammerHeight">-<span class="result-unit">mm</span></div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Anvil Velocity</div>
+                        <div class="result-value" id="anvilVelocity">-<span class="result-unit">m/s</span></div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Maximum Force</div>
+                        <div class="result-value" id="maxForce">-<span class="result-unit">kN</span></div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Reverse Force</div>
+                        <div class="result-value" id="reverseForce">-<span class="result-unit">kN</span></div>
+                    </div>
+
+                    <div class="result-item full-width">
+                        <div class="result-label">Maximum Acceleration</div>
+                        <div class="result-value" id="maxAcceleration">-<span class="result-unit">g</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3>System Constants and Parameters</h3>
+            <p>This calculator implements the standard naval shock testing analysis based on MIL-S-901D specifications with the following physical constants:</p>
+            
+            <table class="constants-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Unit</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Anvil Mass</td>
+                    <td>2041.166</td>
+                    <td>kg</td>
+                    <td>Standard test anvil mass</td>
+                </tr>
+                <tr>
+                    <td>Test Length</td>
+                    <td>1.27</td>
+                    <td>m</td>
+                    <td>Standard beam test length</td>
+                </tr>
+                <tr>
+                    <td>Elastic Modulus</td>
+                    <td>210 × 10⁹</td>
+                    <td>Pa</td>
+                    <td>Steel elastic modulus</td>
+                </tr>
+                <tr>
+                    <td>Gravity</td>
+                    <td>9.81</td>
+                    <td>m/s²</td>
+                    <td>Standard gravitational acceleration</td>
+                </tr>
+            </table>
+            
+            <p style="margin-top: 15px; font-style: italic; color: #888;">
+                Channel configuration and hammer drop heights are determined using standardized lookup tables based on equipment weight and dimensions.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Channel count lookup function
+        function getChannelCount(weight_kg, A_dimension_mm) {
+            const A_values = [254, 304.8, 355.6, 406.4, 457.2, 508, 558.8, 609.6, 660.4,
+                             711.2, 762, 812.8, 863.6, 914.4, 965.2, 1016, 1066.8, 1117.6];
+            
+            const weight_values = [226.7995, 272.1594, 317.5193, 362.8792, 408.2391, 453.599,
+                                  498.9589, 544.3188, 589.6787, 635.0386, 680.3985, 725.7584,
+                                  771.1183, 816.4782, 861.8381, 907.198, 952.5579, 997.9178,
+                                  1043.2777, 1088.6376, 1133.9975, 1179.3574, 1224.7173,
+                                  1270.0772, 1315.4371, 1360.797, 1406.1569, 1451.5168,
+                                  1496.8767, 1542.2366, 1587.5965, 1632.9564, 1678.3163,
+                                  1723.6762, 1769.0361, 1814.396, 1859.7559, 1905.1158,
+                                  1950.4757, 1995.8356, 2041.1955, 2086.5554, 2131.9153, 2177.2752];
+
+            // Find weight index
+            let weight_idx = 0;
+            for (let i = 0; i < weight_values.length; i++) {
+                if ((weight_values[i] - weight_kg) > 0) {
+                    weight_idx = i;
+                    break;
+                }
+            }
+
+            // Find A dimension index
+            let A_idx = 0;
+            for (let i = 0; i < A_values.length; i++) {
+                if ((A_values[i] - A_dimension_mm) > 0) {
+                    A_idx = i;
+                    break;
+                }
+            }
+
+            // Channel matrix (44x18)
+            const channel_matrix = [
+                [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                [3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                [3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                [3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                [4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                [4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2],
+                [4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2],
+                [5, 5, 4, 4, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2],
+                [5, 5, 5, 4, 4, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2],
+                [5, 5, 5, 5, 5, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2],
+                [6, 5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 2],
+                [6, 6, 6, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3],
+                [6, 6, 6, 6, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3],
+                [null, 6, 6, 6, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3],
+                [null, null, 6, 6, 6, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3],
+                [null, null, null, 6, 6, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 3, 3, 3],
+                [null, null, null, null, 6, 6, 6, 5, 5, 5, 4, 4, 3, 3, 3, 3, 3, 3],
+                [null, null, null, null, null, 6, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 3, 3],
+                [null, null, null, null, null, 6, 6, 6, 5, 5, 5, 4, 4, 3, 3, 3, 3, 3],
+                [null, null, null, null, null, null, 6, 6, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4],
+                [null, null, null, null, null, null, null, 6, 6, 5, 5, 4, 4, 4, 4, 4, 4, 4],
+                [null, null, null, null, null, null, null, 6, 6, 5, 5, 5, 4, 4, 4, 4, 4, 4],
+                [null, null, null, null, null, null, null, null, 6, 6, 5, 5, 4, 4, 4, 4, 4, 4],
+                [null, null, null, null, null, null, null, null, 6, 6, 5, 5, 4, 4, 4, 4, 4, 4],
+                [null, null, null, null, null, null, null, null, 6, 6, 6, 5, 5, 4, 4, 4, 4, 4],
+                [null, null, null, null, null, null, null, null, null, 6, 6, 5, 5, 4, 4, 4, 4, 4],
+                [null, null, null, null, null, null, null, null, null, 6, 6, 5, 5, 4, 4, 4, 4, 4],
+                [null, null, null, null, null, null, null, null, null, null, 6, 5, 5, 5, 5, 5, 5, 5],
+                [null, null, null, null, null, null, null, null, null, null, 6, 6, 5, 5, 5, 5, 5, 5],
+                [null, null, null, null, null, null, null, null, null, null, 6, 6, 5, 5, 5, 5, 5, 5],
+                [null, null, null, null, null, null, null, null, null, null, 6, 6, 5, 5, 5, 5, 5, 5],
+                [null, null, null, null, null, null, null, null, null, null, 6, 6, 5, 5, 5, 5, 5, 5],
+                [null, null, null, null, null, null, null, null, null, null, null, 6, 5, 5, 5, 5, 5, 5],
+                [null, null, null, null, null, null, null, null, null, null, null, 6, 6, 5, 5, 5, 5, 5],
+                [null, null, null, null, null, null, null, null, null, null, null, 6, 6, 5, 5, 5, 5, 5],
+                [null, null, null, null, null, null, null, null, null, null, null, null, 6, 6, 6, 6, 6, 6],
+                [null, null, null, null, null, null, null, null, null, null, null, null, 6, 6, 6, 6, 6, 6],
+                [null, null, null, null, null, null, null, null, null, null, null, null, 6, 6, 6, 6, 6, 6],
+                [null, null, null, null, null, null, null, null, null, null, null, null, 6, 6, 6, 6, 6, 6],
+                [null, null, null, null, null, null, null, null, null, null, null, null, null, 6, 6, 6, 6, 6],
+                [null, null, null, null, null, null, null, null, null, null, null, null, null, 6, 6, 6, 6, 6],
+                [null, null, null, null, null, null, null, null, null, null, null, null, null, 6, 6, 6, 6, 6],
+                [null, null, null, null, null, null, null, null, null, null, null, null, null, 6, 6, 6, 6, 6]
+            ];
+
+            return channel_matrix[weight_idx][A_idx];
+        }
+
+        // Resonance frequency calculation
+        function resonanceCalc(num_channels, weight_kg, A_dimension_mm) {
+            const I_array = [7.8132E-06, 1.1260E-05, 1.4707E-05, 1.8613E-05, 2.2060E-05];
+            
+            let I;
+            switch(num_channels) {
+                case 2: I = I_array[0]; break;
+                case 3: I = I_array[1]; break;
+                case 4: I = I_array[2]; break;
+                case 5: I = I_array[3]; break;
+                case 6: I = I_array[4]; break;
+                default: I = I_array[2]; break;
+            }
+
+            const L = 1.27; // m
+            const m = weight_kg; // kg
+            const a = (L - A_dimension_mm/1000) / 2;
+            const g = 9.81; // m/s^2
+            const E = 210e9; // Pa
+            const m_anvil = 2041.166; // kg
+
+            const y = m * g * a / (12 * E * I) * (4 * a * a - 3 * L * a);
+            const k = m * g / 2 / Math.abs(y);
+
+            const fr = 1 / (2 * Math.PI) * Math.sqrt((m + m_anvil) / (m * m_anvil) * k);
+
+            return fr;
+        }
+
+        // Hammer drop height calculation
+        function getHammerDropHeight(weight_kg) {
+            const weight_ranges = [
+                [0, 453], [453.6, 907.2], [907.2, 1360.8], [1360.8, 1587.6],
+                [1587.6, 1814.4], [1814.4, 1905.1], [1905.1, 1995.8], [1995.8, 2086.5],
+                [2086.5, 2177.2], [2177.2, 2268.0], [2268.0, 2358.7], [2358.7, 2449.4],
+                [2449.4, 2540.1], [2540.1, 2812.3], [2812.3, 3084.4], [3084.4, 3356.6]
+            ];
+
+            const drop_height_matrix = [
+                [229, 533, 533], [305, 610, 610], [381, 686, 686], [457, 762, 762],
+                [533, 838, 838], [610, 914, 914], [610, 991, 991], [610, 1067, 1067],
+                [686, 1143, 1143], [686, 1219, 1219], [762, 1372, 1372], [762, 1524, 1524],
+                [762, 1676, 1676], [838, 1676, 1676], [914, 1676, 1676], [991, 1676, 1676]
+            ];
+
+            let weight_idx = 0;
+
+            if (weight_kg < 453) {
+                weight_idx = 0;
+            } else {
+                for (let i = 1; i < weight_ranges.length; i++) {
+                    if (weight_kg >= weight_ranges[i][0] && weight_kg < weight_ranges[i][1]) {
+                        weight_idx = i;
+                        break;
+                    }
+                }
+                if (weight_idx === 0 && weight_kg >= weight_ranges[weight_ranges.length - 1][0]) {
+                    weight_idx = weight_ranges.length - 1;
+                }
+            }
+
+            return drop_height_matrix[weight_idx];
+        }
+
+        // Main calculation function
+        function calculateShockParameters() {
+            const weight_kg = parseFloat(document.getElementById('weight').value);
+            const A_dimension_mm = parseFloat(document.getElementById('aDimension').value);
+
+            // Validation
+            if (isNaN(weight_kg) || weight_kg <= 0) {
+                showError('Please enter a valid equipment weight (kg)');
+                return;
+            }
+
+            if (isNaN(A_dimension_mm) || A_dimension_mm <= 0) {
+                showError('Please enter a valid A dimension (mm)');
+                return;
+            }
+
+            hideError();
+
+            try {
+                // Constants
+                const g = 9.81; // m/s^2
+                const m_anvil = 2041.166; // kg
+
+                // Calculate parameters
+                const num_channels = getChannelCount(weight_kg, A_dimension_mm);
+                const fr = resonanceCalc(num_channels, weight_kg, A_dimension_mm);
+                const drop_heights = getHammerDropHeight(weight_kg);
+                const h_max = Math.max(...drop_heights) / 1000; // Convert to meters
+
+                // Calculate velocities and forces
+                const v_hammer = Math.sqrt(2 * g * h_max);
+                const v_anvil = 0.545 * v_hammer;
+                const f_max = fr * 2 * Math.PI * weight_kg * m_anvil / (weight_kg + m_anvil) * v_anvil;
+                const f_reverse = f_max * 1.3;
+                const acc_max = f_max / weight_kg / g;
+
+                // Update results
+                document.getElementById('numChannels').textContent = num_channels || 'N/A';
+                document.getElementById('resonanceFreq').innerHTML = fr ? fr.toFixed(1) + '<span class="result-unit">Hz</span>' : 'N/A';
+                document.getElementById('hammerHeight').innerHTML = Math.max(...drop_heights).toFixed(0) + '<span class="result-unit">mm</span>';
+                document.getElementById('anvilVelocity').innerHTML = v_anvil.toFixed(2) + '<span class="result-unit">m/s</span>';
+                document.getElementById('maxForce').innerHTML = (f_max/1000).toFixed(0) + '<span class="result-unit">kN</span>';
+                document.getElementById('reverseForce').innerHTML = (f_reverse/1000).toFixed(0) + '<span class="result-unit">kN</span>';
+                document.getElementById('maxAcceleration').innerHTML = acc_max.toFixed(1) + '<span class="result-unit">g</span>';
+
+            } catch (error) {
+                showError('Calculation error: ' + error.message);
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Initialize with example values
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('weight').value = '120';
+            document.getElementById('aDimension').value = '380';
+        });
+
+        // Allow Enter key to trigger calculation
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateShockParameters();
+            }
+        });
+    </script>
+</body>
+</html>
