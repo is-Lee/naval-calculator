@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,6 +22,21 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-section img {
+            max-height: 80px;
+            width: auto;
+            filter: brightness(1.1);
         }
 
         .header {
@@ -204,6 +219,27 @@
             color: #555;
         }
 
+        .footer {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer p {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .footer .author {
+            font-weight: 600;
+            color: #b3d1ff;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -225,6 +261,10 @@
             .container {
                 padding: 15px;
             }
+
+            .logo-section img {
+                max-height: 60px;
+            }
         }
 
         .loading {
@@ -239,6 +279,11 @@
 </head>
 <body>
     <div class="container">
+        <div class="logo-section">
+            <img src="HEnglish_jpg.png" alt="한국조선해양기자재연구원 로고" 
+                 onerror="this.src='./HEnglish_jpg.png'; this.onerror=function(){this.style.display='none'};">
+        </div>
+
         <div class="header">
             <h1>Naval Shock Testing Analysis Calculator</h1>
             <p>Professional acoustic analysis tool for MIL-S-901D compliance testing</p>
@@ -347,6 +392,12 @@
             <p style="margin-top: 15px; font-style: italic; color: #888;">
                 Channel configuration and hammer drop heights are determined using standardized lookup tables based on equipment weight and dimensions.
             </p>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 Naval Shock Testing Analysis Calculator</p>
+            <p>Developed by <span class="author">Lee Inseok</span></p>
+            <p>Korea Marine Equipment Research Institute</p>
         </div>
     </div>
 
@@ -563,6 +614,9 @@
             document.getElementById('weight').value = '120';
             document.getElementById('aDimension').value = '380';
         });
+    </script>
+</body>
+</html>
 
         // Allow Enter key to trigger calculation
         document.addEventListener('keypress', function(e) {
@@ -570,6 +624,3 @@
                 calculateShockParameters();
             }
         });
-    </script>
-</body>
-</html>
